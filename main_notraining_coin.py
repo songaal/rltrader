@@ -9,14 +9,14 @@ from policy_learner_coin import PolicyLearner
 
 
 if __name__ == '__main__':
-    stock_code = 'BTCUSDT'  # 삼성전자
+    symbol = 'BTCUSDT'  # 삼성전자
     model_ver = '20180911141026'
 
     # 로그 기록
-    log_dir = os.path.join(settings.BASE_DIR, 'logs/%s' % stock_code)
+    log_dir = os.path.join(settings.BASE_DIR, 'logs/%s' % symbol)
     timestr = settings.get_time_str()
     file_handler = logging.FileHandler(filename=os.path.join(
-        log_dir, "%s_%s.log" % (stock_code, timestr)), encoding='utf-8')
+        log_dir, "%s_%s.log" % (symbol, timestr)), encoding='utf-8')
     stream_handler = logging.StreamHandler()
     file_handler.setLevel(logging.DEBUG)
     stream_handler.setLevel(logging.INFO)
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     # 주식 데이터 준비
     chart_data = data_manager.load_chart_data(
         os.path.join(settings.BASE_DIR,
-                     'data/chart_data/{}.csv'.format(stock_code)))
+                     'data/chart_data/{}.csv'.format(symbol)))
     chart_data['date'] = pandas.to_datetime(chart_data['date'])
     prep_data = data_manager.preprocess(chart_data)
     training_data = data_manager.build_training_data(prep_data)
@@ -54,9 +54,9 @@ if __name__ == '__main__':
 
     # 비 학습 투자 시뮬레이션 시작
     policy_learner = PolicyLearner(
-        stock_code=stock_code, chart_data=chart_data, training_data=training_data,
+        stock_code=symbol, chart_data=chart_data, training_data=training_data,
         min_trading_unit=1, max_trading_unit=3)
     policy_learner.trade(balance=10000,
                          model_path=os.path.join(
                              settings.BASE_DIR,
-                             'models/{}/model_{}.h5'.format(stock_code, model_ver)))
+                             'models/{}/model_{}.h5'.format(symbol, model_ver)))

@@ -8,6 +8,9 @@ from policy_learner_coin import PolicyLearner
 
 if __name__ == '__main__':
     symbol = 'BTCUSDT'
+    t_start = '2017-09-01'
+    t_end = '2018-06-30'
+    epoches = 1000
 
     # 로그 기록
     log_dir = os.path.join(settings.BASE_DIR, 'logs/%s' % symbol)
@@ -31,8 +34,8 @@ if __name__ == '__main__':
     training_data = data_manager.build_training_data(prep_data)
 
     # 기간 필터링
-    training_data = training_data[(training_data['date'] >= '2017-09-01') &
-                                  (training_data['date'] <= '2018-06-30')]
+    training_data = training_data[(training_data['date'] >= t_start) &
+                                  (training_data['date'] <= t_end)]
     training_data = training_data.dropna()
 
     # 차트 데이터 분리
@@ -55,7 +58,7 @@ if __name__ == '__main__':
     policy_learner = PolicyLearner(
         symbol=symbol, chart_data=chart_data, training_data=training_data,
         min_trading_unit=1, max_trading_unit=2, delayed_reward_threshold=.2, lr=.001)
-    policy_learner.fit(balance=1000000, num_epoches=10000,
+    policy_learner.fit(balance=1000000, num_epoches=epoches,
                        discount_factor=0, start_epsilon=.5)
 
     # 정책 신경망을 파일로 저장
