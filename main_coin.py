@@ -4,7 +4,9 @@ import settings
 import data_manager
 import pandas
 from policy_learner_coin import PolicyLearner
+import datetime
 
+# SELECT first("open") AS "first_open", max("high") AS "max_high", min("low") AS "min_low", last("close") AS "last_close", sum("volume") AS "sum_volume" FROM "coin_v2"."autogen"."binance_btc_usdt" GROUP BY time(1d) FILL(null)
 
 if __name__ == '__main__':
     symbol = 'BTCUSDT'
@@ -53,7 +55,7 @@ if __name__ == '__main__':
         'close_ma120_ratio', 'volume_ma120_ratio'
     ]
     training_data = training_data[features_training_data]
-
+    training_start = datetime.datetime.now()
     # 강화학습 시작
     policy_learner = PolicyLearner(
         symbol=symbol, chart_data=chart_data, training_data=training_data,
@@ -61,6 +63,9 @@ if __name__ == '__main__':
     policy_learner.fit(balance=1000000, num_epoches=epoches,
                        discount_factor=0, start_epsilon=.5)
 
+    training_end = datetime.datetime.now()
+    delta = training_end - training_start
+    logging.info("학습 소요시간: %s", delta)
     # 정책 신경망을 파일로 저장
     model_dir = os.path.join(settings.BASE_DIR, 'models/%s' % symbol)
     if not os.path.isdir(model_dir):
