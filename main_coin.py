@@ -10,9 +10,10 @@ import datetime
 
 if __name__ == '__main__':
     symbol = 'BTCUSDT'
-    t_start = '2017-09-01'
-    t_end = '2018-06-30'
-    epoches = 1000
+    t_start = '2017-12-01'
+    t_end = '2018-08-31'
+    epoches = 500
+    balance = 100000000
 
     # 로그 기록
     log_dir = os.path.join(settings.BASE_DIR, 'logs/%s' % symbol)
@@ -60,12 +61,13 @@ if __name__ == '__main__':
     policy_learner = PolicyLearner(
         symbol=symbol, chart_data=chart_data, training_data=training_data,
         min_trading_unit=1, max_trading_unit=2, delayed_reward_threshold=.2, lr=.001)
-    policy_learner.fit(balance=1000000, num_epoches=epoches,
+    policy_learner.fit(balance=balance, num_epoches=epoches,
                        discount_factor=0, start_epsilon=.5)
 
     training_end = datetime.datetime.now()
     delta = training_end - training_start
     logging.info("학습 소요시간: %s", delta)
+    logging.info("모델파일: models/%s/model_%s.h5", symbol, timestr)
     # 정책 신경망을 파일로 저장
     model_dir = os.path.join(settings.BASE_DIR, 'models/%s' % symbol)
     if not os.path.isdir(model_dir):

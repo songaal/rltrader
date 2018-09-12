@@ -10,9 +10,9 @@ from policy_learner_coin import PolicyLearner
 
 if __name__ == '__main__':
     symbol = 'BTCUSDT'
-    model_ver = '20180911145729'
-    start = '2018-08-01'
-    end = '2018-08-02'
+    model_ver = '20180912113754'
+    start = '2017-12-01'
+    end = '2018-01-11'
 
     # 로그 기록
     log_dir = os.path.join(settings.BASE_DIR, 'logs/%s' % symbol)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     policy_learner = PolicyLearner(
         symbol=symbol, chart_data=chart_data, training_data=training_data,
         min_trading_unit=1, max_trading_unit=3)
-    policy_learner.trade(balance=1000000,
+    policy_learner.trade(balance=100000000,
                          model_path=os.path.join(
                              settings.BASE_DIR,
                              'models/{}/model_{}.h5'.format(symbol, model_ver)))
