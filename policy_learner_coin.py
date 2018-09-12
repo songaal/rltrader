@@ -33,14 +33,14 @@ class PolicyLearner:
         self.num_features = self.training_data.shape[1] + self.agent.STATE_DIM
         self.policy_network = PolicyNetwork(
             input_dim=self.num_features, output_dim=self.agent.NUM_ACTIONS, lr=lr)
-        self.visualizer = Visualizer()  # 가시화 모듈
+        self.visualizer = Visualizer()
 
     def reset(self):
         self.sample = None
         self.training_data_idx = -1
 
     def fit(
-        self, num_epoches=1000, max_memory=120, balance=10000000,
+        self, num_epoches=1000, max_memory=30, balance=10000000,
         discount_factor=0, start_epsilon=.5, learning=True):
         logger.info("LR: {lr}, DF: {discount_factor}, "
                     "TU: [{min_trading_unit}, {max_trading_unit}], "
@@ -183,13 +183,12 @@ class PolicyLearner:
                 loss /= pos_learning_cnt + neg_learning_cnt
             logger.info("[Epoch %s/%s]\tEpsilon:%.4f\t#Expl.:%d/%d\t"
                         "#Buy:%d\t#Sell:%d\t#Hold:%d\t"
-                        "#Coin:%f   \tBase:%f\t"
+                        "#Coin:%f   \tPV:%s\t"
                         "POS:%s\tNEG:%s\tLoss:%10.6f" % (
                             epoch_str, num_epoches, epsilon, exploration_cnt, itr_cnt,
                             self.agent.num_buy, self.agent.num_sell, self.agent.num_hold,
                             self.agent.num_stocks,
-                            # locale.currency(self.agent.portfolio_value, grouping=True),
-                            self.agent.portfolio_value,
+                            locale.currency(self.agent.portfolio_value, grouping=True),
                             pos_learning_cnt, neg_learning_cnt, loss))
 
             # 학습 관련 정보 갱신

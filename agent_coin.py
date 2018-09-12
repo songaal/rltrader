@@ -145,8 +145,7 @@ class Agent:
 
         # 포트폴리오 가치 갱신
         self.portfolio_value = self.balance + curr_price * self.num_stocks
-        profitloss = (
-            (self.portfolio_value - self.base_portfolio_value) / self.base_portfolio_value)
+        profitloss = ((self.portfolio_value - self.base_portfolio_value) / self.base_portfolio_value)
 
         # 즉시 보상 판단
         self.immediate_reward = 1 if profitloss >= 0 else -1
