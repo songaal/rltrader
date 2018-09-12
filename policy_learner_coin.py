@@ -5,7 +5,7 @@ import numpy as np
 import settings
 from environment import Environment
 from agent_coin import Agent
-from policy_network import PolicyNetwork
+from policy_network_coin import PolicyNetwork
 from visualizer import Visualizer
 
 

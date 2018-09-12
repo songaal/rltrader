@@ -10,7 +10,7 @@ import datetime
 
 if __name__ == '__main__':
     symbol = 'BTCUSDT'
-    t_start = '2018-01-01'
+    t_start = '2018-08-01'
     t_end = '2018-08-31'
     epoches = 1000
     balance = 100000
@@ -57,9 +57,8 @@ if __name__ == '__main__':
     # 강화학습 시작
     policy_learner = PolicyLearner(
         symbol=symbol, chart_data=chart_data, training_data=training_data,
-        min_trading_unit=1, max_trading_unit=2, delayed_reward_threshold=.00005, lr=.001)
-    policy_learner.fit(balance=balance, num_epoches=epoches,
-                       discount_factor=0, start_epsilon=.5)
+        min_trading_unit=1, max_trading_unit=2, delayed_reward_threshold=.0000000005, lr=.00000001)
+    policy_learner.fit(balance=balance, num_epoches=epoches, discount_factor=0, start_epsilon=.5)
 
     training_end = datetime.datetime.now()
     delta = training_end - training_start
