@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     # 학습 데이터 분리
     features_training_data = [
-        'date', 'open', 'high', 'low', 'close', 'volume',
+        'open', 'high', 'low', 'close', 'volume',
         'rsi14', 'sma5', 'sma20', 'sma120', 'ema12', 'ema26',
         'dn', 'mavg', 'up', 'pctB', 'macd', 'macdsignal',
     ]

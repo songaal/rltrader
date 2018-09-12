@@ -1,13 +1,13 @@
 import numpy as np
-
+import math
 
 class Agent:
     # 에이전트 상태가 구성하는 값 개수
     STATE_DIM = 2  # 주식 보유 비율, 포트폴리오 가치 비율
 
     # 매매 수수료
-    TRADING_CHARGE = 0.01  # 거래 수수료
-    SLIPPAGE = 0.004 # 슬리피지
+    TRADING_CHARGE = 0.001  # 거래 수수료
+    SLIPPAGE = 0.0004  # 슬리피지
 
     # 행동
     ACTION_BUY = 0  # 매수
@@ -115,22 +115,28 @@ class Agent:
         # 매수
         if action == Agent.ACTION_BUY:
             # 매수할 단위를 판단
-            buy_price = (curr_price * (1 + self.TRADING_CHARGE) * self.min_trading_unit) * (1 + self.SLIPPAGE)
-            trading_unit = self.balance / buy_price
+            commission = curr_price * self.TRADING_CHARGE
+            slipage = curr_price * self.SLIPPAGE
+            buy_price = curr_price + commission + slipage
+            trading_unit = math.floor((self.balance / buy_price) * 100000000) / 100000000
             # 수수료를 적용하여 총 매수 금액 산정
-            invest_amount = curr_price * trading_unit
+            invest_amount = buy_price * trading_unit
+            # print('BOT: 보유 자산: ', self.balance, '종가:', curr_price, ', 구매 수량: ', trading_unit, '총구매 가격:', invest_amount, '보유코인 수량:', self.num_stocks)
             self.balance -= invest_amount  # 보유 현금을 갱신
             self.num_stocks += trading_unit  # 보유 코인 수를 갱신
             self.num_buy += 1  # 매수 횟수 증가
         # 매도
         elif action == Agent.ACTION_SELL:
             # 매도할 단위를 판단
-            trading_unit = self.num_stocks
-            sell_price = (curr_price * (1 + self.TRADING_CHARGE) * self.min_trading_unit) * (1 + self.SLIPPAGE)
+            trading_unit = self.num_stocks  # 전체 수량
+            sell_price = self.num_stocks * curr_price  # 전체수량 판매가격
+            commission = sell_price * self.TRADING_CHARGE  # 수수료 제외
+            slipage = sell_price * self.SLIPPAGE  # 슬리피지 제외
             # 매도
-            invest_amount = sell_price * trading_unit
+            invest_amount = sell_price - commission - slipage
+            # print('SLD: 보유 자산: ', self.balance, '종가:', curr_price, ', 판매 수량: ', trading_unit, '총판매 가격:', invest_amount, '보유코인 수량: ', self.num_stocks)
             self.num_stocks -= trading_unit  # 보유 주식 수를 갱신
-            self.balance += invest_amount * (1 + self.SLIPPAGE)  # 보유 현금을 갱신
+            self.balance += invest_amount  # 보유 현금을 갱신
             self.num_sell += 1  # 매도 횟수 증가
 
         # 홀딩
