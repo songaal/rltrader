@@ -11,8 +11,8 @@ from policy_learner_coin import PolicyLearner
 if __name__ == '__main__':
     symbol = 'BTCUSDT'
     model_ver = '20180911145729'
-    start = '2018-07-01'
-    end = '2018-08-01'
+    start = '2018-08-01'
+    end = '2018-08-02'
 
     # 로그 기록
     log_dir = os.path.join(settings.BASE_DIR, 'logs/%s' % symbol)
@@ -34,8 +34,8 @@ if __name__ == '__main__':
     training_data = data_manager.build_training_data(prep_data)
 
     # 기간 필터링
-    training_data = training_data[(training_data['date'] >= '2018-07-01') &
-                                  (training_data['date'] <= '2018-08-01')]
+    training_data = training_data[(training_data['date'] >= start) &
+                                  (training_data['date'] <= end)]
     training_data = training_data.dropna()
 
     # 차트 데이터 분리
