@@ -9,8 +9,8 @@ from policy_learner_coin import PolicyLearner
 
 
 if __name__ == '__main__':
-    symbol = 'BTCUSDT'  # 삼성전자
-    model_ver = '20180911141026'
+    symbol = 'BTCUSDT'
+    model_ver = '20180911145729'
 
     # 로그 기록
     log_dir = os.path.join(settings.BASE_DIR, 'logs/%s' % symbol)
@@ -54,9 +54,9 @@ if __name__ == '__main__':
 
     # 비 학습 투자 시뮬레이션 시작
     policy_learner = PolicyLearner(
-        stock_code=symbol, chart_data=chart_data, training_data=training_data,
+        symbol=symbol, chart_data=chart_data, training_data=training_data,
         min_trading_unit=1, max_trading_unit=3)
-    policy_learner.trade(balance=10000,
+    policy_learner.trade(balance=1000000,
                          model_path=os.path.join(
                              settings.BASE_DIR,
                              'models/{}/model_{}.h5'.format(symbol, model_ver)))
