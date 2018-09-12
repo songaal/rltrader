@@ -2,17 +2,18 @@ import logging
 import os
 
 import pandas
+import sys
 
 import settings
-import data_manager
+import data_manager_coin
 from policy_learner_coin import PolicyLearner
 
 
 if __name__ == '__main__':
     symbol = 'BTCUSDT'
-    model_ver = '20180912113754'
-    start = '2017-12-01'
-    end = '2018-01-11'
+    model_ver = '20180912124944'
+    start = '2018-09-01'
+    end = '2018-09-11'
 
     # 로그 기록
     log_dir = os.path.join(settings.BASE_DIR, 'logs/%s' % symbol)
@@ -26,12 +27,12 @@ if __name__ == '__main__':
         handlers=[file_handler, stream_handler], level=logging.DEBUG)
 
     # 주식 데이터 준비
-    chart_data = data_manager.load_chart_data(
+    chart_data = data_manager_coin.load_chart_data(
         os.path.join(settings.BASE_DIR,
                      'data/chart_data/{}.csv'.format(symbol)))
     chart_data['date'] = pandas.to_datetime(chart_data['date'])
-    prep_data = data_manager.preprocess(chart_data)
-    training_data = data_manager.build_training_data(prep_data)
+    prep_data = data_manager_coin.preprocess(chart_data)
+    training_data = data_manager_coin.build_training_data(prep_data)
 
     # 기간 필터링
     training_data = training_data[(training_data['date'] >= start) &
@@ -44,14 +45,21 @@ if __name__ == '__main__':
 
     # 학습 데이터 분리
     features_training_data = [
-        'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',
-        'close_lastclose_ratio', 'volume_lastvolume_ratio',
-        'close_ma5_ratio', 'volume_ma5_ratio',
-        'close_ma10_ratio', 'volume_ma10_ratio',
-        'close_ma20_ratio', 'volume_ma20_ratio',
-        'close_ma60_ratio', 'volume_ma60_ratio',
-        'close_ma120_ratio', 'volume_ma120_ratio'
+        'open', 'high', 'low', 'close', 'volume',
+        'close_ma5', 'volume_ma5', 'close_ma10', 'volume_ma10',
+        'close_ma20', 'volume_ma20', 'close_ma60', 'volume_ma60',
+        'close_ma120', 'volume_ma120',
+        'rsi_close'
     ]
+    # features_training_data = [
+    #     'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',
+    #     'close_lastclose_ratio', 'volume_lastvolume_ratio',
+    #     'close_ma5_ratio', 'volume_ma5_ratio',
+    #     'close_ma10_ratio', 'volume_ma10_ratio',
+    #     'close_ma20_ratio', 'volume_ma20_ratio',
+    #     'close_ma60_ratio', 'volume_ma60_ratio',
+    #     'close_ma120_ratio', 'volume_ma120_ratio'
+    # ]
     training_data = training_data[features_training_data]
 
     # 비 학습 투자 시뮬레이션 시작

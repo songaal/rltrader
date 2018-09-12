@@ -12,8 +12,8 @@ if __name__ == '__main__':
     symbol = 'BTCUSDT'
     t_start = '2018-01-01'
     t_end = '2018-08-31'
-    epoches = 50
-    balance = 100000000
+    epoches = 1000
+    balance = 100000
 
     # 로그 기록
     log_dir = os.path.join(settings.BASE_DIR, 'logs/%s' % symbol)
@@ -47,26 +47,11 @@ if __name__ == '__main__':
 
     # 학습 데이터 분리
     features_training_data = [
-        'open', 'high', 'low', 'close', 'volume',
-        'close_ma5', 'volume_ma5', 'close_ma10', 'volume_ma10',
-        'close_ma20', 'volume_ma20', 'close_ma60', 'volume_ma60',
-        'close_ma120', 'volume_ma120'
+        'date', 'open', 'high', 'low', 'close', 'volume',
+        'rsi14', 'sma5', 'sma20', 'sma120', 'ema12', 'ema26',
+        'dn', 'mavg', 'up', 'pctB', 'macd', 'macdsignal',
     ]
-    # features_training_data = [
-    #     'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',
-    #     'close_lastclose_ratio', 'volume_lastvolume_ratio',
-    #     'inst_lastinst_ratio', 'frgn_lastfrgn_ratio',
-    #     'close_ma5_ratio', 'volume_ma5_ratio',
-    #     'inst_ma5_ratio', 'frgn_ma5_ratio',
-    #     'close_ma10_ratio', 'volume_ma10_ratio',
-    #     'inst_ma10_ratio', 'frgn_ma10_ratio',
-    #     'close_ma20_ratio', 'volume_ma20_ratio',
-    #     'inst_ma20_ratio', 'frgn_ma20_ratio',
-    #     'close_ma60_ratio', 'volume_ma60_ratio',
-    #     'inst_ma60_ratio', 'frgn_ma60_ratio',
-    #     'close_ma120_ratio', 'volume_ma120_ratio',
-    #     'inst_ma120_ratio', 'frgn_ma120_ratio',
-    # ]
+
     training_data = training_data[features_training_data]
     training_start = datetime.datetime.now()
     # 강화학습 시작

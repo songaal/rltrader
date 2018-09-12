@@ -5,9 +5,9 @@ class Agent:
     # 에이전트 상태가 구성하는 값 개수
     STATE_DIM = 2  # 주식 보유 비율, 포트폴리오 가치 비율
 
-    # 매매 수수료 및 세금
-    TRADING_CHARGE = 0.01  # 거래 수수료 미고려 (일반적으로 0.015%)
-    TRADING_TAX = 0  # 거래세 미고려 (실제 0.3%)
+    # 매매 수수료
+    TRADING_CHARGE = 0.01  # 거래 수수료
+    SLIPPAGE = 0.004 # 슬리피지
 
     # 행동
     ACTION_BUY = 0  # 매수
@@ -82,9 +82,10 @@ class Agent:
     def validate_action(self, action):
         validity = True
         if action == Agent.ACTION_BUY:
-            # 적어도 1주를 살 수 있는지 확인
-            if self.balance < self.environment.get_price() * (
-                1 + self.TRADING_CHARGE) * self.min_trading_unit:
+            # self.environment.get_price() 종가.
+            # (1 + self.TRADING_CHARGE) 1개 수수료
+            # self.min_trading_unit 최소 구매 단위
+            if self.balance < (self.environment.get_price() * (1 + self.TRADING_CHARGE) * self.min_trading_unit) * (1 + self.SLIPPAGE):
                 validity = False
         elif action == Agent.ACTION_SELL:
             # 주식 잔고가 있는지 확인 
@@ -114,32 +115,22 @@ class Agent:
         # 매수
         if action == Agent.ACTION_BUY:
             # 매수할 단위를 판단
-            trading_unit = self.decide_trading_unit(confidence)
-            balance = self.balance - curr_price * (1 + self.TRADING_CHARGE) * trading_unit
-            # 보유 현금이 모자랄 경우 보유 현금으로 가능한 만큼 최대한 매수
-            if balance < 0:
-                trading_unit = max(min(
-                    int(self.balance / (
-                        curr_price * (1 + self.TRADING_CHARGE))), self.max_trading_unit),
-                    self.min_trading_unit
-                )
+            buy_price = (curr_price * (1 + self.TRADING_CHARGE) * self.min_trading_unit) * (1 + self.SLIPPAGE)
+            trading_unit = self.balance / buy_price
             # 수수료를 적용하여 총 매수 금액 산정
-            invest_amount = curr_price * (1 + self.TRADING_CHARGE) * trading_unit
+            invest_amount = curr_price * trading_unit
             self.balance -= invest_amount  # 보유 현금을 갱신
-            self.num_stocks += trading_unit  # 보유 주식 수를 갱신
+            self.num_stocks += trading_unit  # 보유 코인 수를 갱신
             self.num_buy += 1  # 매수 횟수 증가
-
         # 매도
         elif action == Agent.ACTION_SELL:
             # 매도할 단위를 판단
-            trading_unit = self.decide_trading_unit(confidence)
-            # 보유 주식이 모자랄 경우 가능한 만큼 최대한 매도
-            trading_unit = min(trading_unit, self.num_stocks)
+            trading_unit = self.num_stocks
+            sell_price = (curr_price * (1 + self.TRADING_CHARGE) * self.min_trading_unit) * (1 + self.SLIPPAGE)
             # 매도
-            invest_amount = curr_price * (
-                1 - (self.TRADING_TAX + self.TRADING_CHARGE)) * trading_unit
+            invest_amount = sell_price * trading_unit
             self.num_stocks -= trading_unit  # 보유 주식 수를 갱신
-            self.balance += invest_amount  # 보유 현금을 갱신
+            self.balance += invest_amount * (1 + self.SLIPPAGE)  # 보유 현금을 갱신
             self.num_sell += 1  # 매도 횟수 증가
 
         # 홀딩
