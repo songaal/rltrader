@@ -1,7 +1,7 @@
 import logging
 import os
 import settings
-import data_manager
+import data_manager_coin
 import pandas
 from policy_learner_coin import PolicyLearner
 import datetime
@@ -10,9 +10,9 @@ import datetime
 
 if __name__ == '__main__':
     symbol = 'BTCUSDT'
-    t_start = '2017-12-01'
+    t_start = '2018-01-01'
     t_end = '2018-08-31'
-    epoches = 500
+    epoches = 50
     balance = 100000000
 
     # 로그 기록
@@ -29,12 +29,12 @@ if __name__ == '__main__':
                         handlers=[file_handler, stream_handler], level=logging.DEBUG)
 
     # 주식 데이터 준비
-    chart_data = data_manager.load_chart_data(
+    chart_data = data_manager_coin.load_chart_data(
         os.path.join(settings.BASE_DIR,
                      'data/chart_data/{}.csv'.format(symbol)))
     chart_data['date'] = pandas.to_datetime(chart_data['date'])
-    prep_data = data_manager.preprocess(chart_data)
-    training_data = data_manager.build_training_data(prep_data)
+    prep_data = data_manager_coin.preprocess(chart_data)
+    training_data = data_manager_coin.build_training_data(prep_data)
 
     # 기간 필터링
     training_data = training_data[(training_data['date'] >= t_start) &
@@ -47,14 +47,26 @@ if __name__ == '__main__':
 
     # 학습 데이터 분리
     features_training_data = [
-        'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',
-        'close_lastclose_ratio', 'volume_lastvolume_ratio',
-        'close_ma5_ratio', 'volume_ma5_ratio',
-        'close_ma10_ratio', 'volume_ma10_ratio',
-        'close_ma20_ratio', 'volume_ma20_ratio',
-        'close_ma60_ratio', 'volume_ma60_ratio',
-        'close_ma120_ratio', 'volume_ma120_ratio'
+        'open', 'high', 'low', 'close', 'volume',
+        'close_ma5', 'volume_ma5', 'close_ma10', 'volume_ma10',
+        'close_ma20', 'volume_ma20', 'close_ma60', 'volume_ma60',
+        'close_ma120', 'volume_ma120'
     ]
+    # features_training_data = [
+    #     'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',
+    #     'close_lastclose_ratio', 'volume_lastvolume_ratio',
+    #     'inst_lastinst_ratio', 'frgn_lastfrgn_ratio',
+    #     'close_ma5_ratio', 'volume_ma5_ratio',
+    #     'inst_ma5_ratio', 'frgn_ma5_ratio',
+    #     'close_ma10_ratio', 'volume_ma10_ratio',
+    #     'inst_ma10_ratio', 'frgn_ma10_ratio',
+    #     'close_ma20_ratio', 'volume_ma20_ratio',
+    #     'inst_ma20_ratio', 'frgn_ma20_ratio',
+    #     'close_ma60_ratio', 'volume_ma60_ratio',
+    #     'inst_ma60_ratio', 'frgn_ma60_ratio',
+    #     'close_ma120_ratio', 'volume_ma120_ratio',
+    #     'inst_ma120_ratio', 'frgn_ma120_ratio',
+    # ]
     training_data = training_data[features_training_data]
     training_start = datetime.datetime.now()
     # 강화학습 시작
