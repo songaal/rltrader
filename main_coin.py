@@ -10,8 +10,8 @@ import datetime
 
 if __name__ == '__main__':
     symbol = 'BTCUSDT'
-    t_start = '2018-08-01'
-    t_end = '2018-08-31'
+    t_start = '2018-08-16'
+    t_end = '2018-09-01'
     epoches = 1000
     balance = 100000
 
@@ -47,9 +47,11 @@ if __name__ == '__main__':
 
     # 학습 데이터 분리
     features_training_data = [
-        'open', 'high', 'low', 'close', 'volume',
-        'rsi14', 'sma5', 'sma20', 'sma120', 'ema12', 'ema26',
-        'dn', 'mavg', 'up', 'pctB', 'macd', 'macdsignal',
+        'rsi14', 'sma5', 'sma10', 'sma20', 'sma120', 'obv', 'ad',
+        'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',
+        'close_lastclose_ratio', 'volume_lastvolume_ratio',
+        'close_ma5_ratio', 'close_ma10_ratio', 'close_ma20_ratio', 'close_ma120_ratio',
+        'volume_ma5_ratio', 'volume_ma10_ratio', 'volume_ma20_ratio', 'volume_ma120_ratio'
     ]
 
     training_data = training_data[features_training_data]

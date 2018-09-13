@@ -40,7 +40,7 @@ class PolicyLearner:
         self.training_data_idx = -1
 
     def fit(
-        self, num_epoches=1000, max_memory=30, balance=10000000,
+        self, num_epoches=1000, max_memory=5, balance=10000000,
         discount_factor=0, start_epsilon=.5, learning=True):
         logger.info("LR: {lr}, DF: {discount_factor}, "
                     "TU: [{min_trading_unit}, {max_trading_unit}], "
@@ -183,11 +183,10 @@ class PolicyLearner:
                 loss /= pos_learning_cnt + neg_learning_cnt
             logger.info("[Epoch %s/%s]\tEpsilon:%.4f\t#Expl.:%d/%d\t"
                         "#Buy:%d\t#Sell:%d\t#Hold:%d\t"
-                        "#Coin:%f   \tPV:%s\t"
+                        "\tPV:%s\t"
                         "POS:%s\tNEG:%s\tLoss:%10.6f" % (
                             epoch_str, num_epoches, epsilon, exploration_cnt, itr_cnt,
                             self.agent.num_buy, self.agent.num_sell, self.agent.num_hold,
-                            self.agent.num_stocks,
                             locale.currency(self.agent.portfolio_value, grouping=True),
                             pos_learning_cnt, neg_learning_cnt, loss))
 

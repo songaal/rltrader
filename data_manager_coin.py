@@ -26,34 +26,20 @@ def build_training_data(prep_data):
     training_data['sma5'] = np.zeros(len(training_data))
     training_data['sma5'] = talib.SMA(prep_data['close'], 5)
 
+    training_data['sma10'] = np.zeros(len(training_data))
+    training_data['sma10'] = talib.SMA(prep_data['close'], 10)
+
     training_data['sma20'] = np.zeros(len(training_data))
     training_data['sma20'] = talib.SMA(prep_data['close'], 20)
 
     training_data['sma120'] = np.zeros(len(training_data))
     training_data['sma120'] = talib.SMA(prep_data['close'], 120)
 
-    training_data['ema12'] = np.zeros(len(training_data))
-    training_data['ema12'] = talib.SMA(prep_data['close'], 12)
+    training_data['obv'] = np.zeros(len(training_data))
+    training_data['obv'] = talib.OBV(prep_data['close'], prep_data['volume'])
 
-    training_data['ema26'] = np.zeros(len(training_data))
-    training_data['ema26'] = talib.SMA(prep_data['close'], 26)
-
-    upper, middle, lower = talib.BBANDS(prep_data['close'], timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
-    training_data['dn'] = np.zeros(len(training_data))
-    training_data['mavg'] = np.zeros(len(training_data))
-    training_data['up'] = np.zeros(len(training_data))
-    training_data['pctB'] = np.zeros(len(training_data))
-
-    training_data['dn'] = lower
-    training_data['mavg'] = middle
-    training_data['up'] = upper
-    training_data['pctB'] = (prep_data['close'] - lower) / (upper - lower)
-
-    macd, macdsignal, macdhist = talib.MACD(prep_data['close'], 12, 26, 9)
-    training_data['macd'] = np.zeros(len(training_data))
-    training_data['signal'] = np.zeros(len(training_data))
-    training_data['macd'] = macd
-    training_data['macdsignal'] = macdsignal
+    training_data['ad'] = np.zeros(len(training_data))
+    training_data['ad'] = talib.AD(prep_data['high'], prep_data['low'], prep_data['close'], prep_data['volume'])
 
     training_data['open_lastclose_ratio'] = np.zeros(len(training_data))
     training_data.loc[1:, 'open_lastclose_ratio'] = \
@@ -76,14 +62,14 @@ def build_training_data(prep_data):
             .replace(to_replace=0, method='ffill') \
             .replace(to_replace=0, method='bfill').values
 
-    # windows = [5, 10, 20, 60, 120]
-    # for window in windows:
-    #     training_data['close_ma%d_ratio' % window] = \
-    #         (training_data['close'] - training_data['close_ma%d' % window]) / \
-    #         training_data['close_ma%d' % window]
-    #     training_data['volume_ma%d_ratio' % window] = \
-    #         (training_data['volume'] - training_data['volume_ma%d' % window]) / \
-    #         training_data['volume_ma%d' % window]
+    windows = [5, 10, 20, 60, 120]
+    for window in windows:
+        training_data['close_ma%d_ratio' % window] = \
+            (training_data['close'] - training_data['close_ma%d' % window]) / \
+            training_data['close_ma%d' % window]
+        training_data['volume_ma%d_ratio' % window] = \
+            (training_data['volume'] - training_data['volume_ma%d' % window]) / \
+            training_data['volume_ma%d' % window]
 
     return training_data
 
