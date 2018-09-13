@@ -11,7 +11,7 @@ from policy_learner_coin import PolicyLearner
 
 if __name__ == '__main__':
     symbol = 'BTCUSDT'
-    model_ver = '20180913094211'
+    model_ver = '20180913112220'
     start = '2018-01-01'
     end = '2018-09-11'
 
@@ -45,9 +45,11 @@ if __name__ == '__main__':
 
     # 학습 데이터 분리
     features_training_data = [
-        'open', 'high', 'low', 'close', 'volume',
-        'rsi14', 'sma5', 'sma20', 'sma120', 'ema12', 'ema26',
-        'dn', 'mavg', 'up', 'pctB', 'macd', 'macdsignal',
+        'rsi14', 'sma5', 'sma10', 'sma20', 'sma120', 'obv', 'ad',
+        'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',
+        'close_lastclose_ratio', 'volume_lastvolume_ratio',
+        'close_ma5_ratio', 'close_ma10_ratio', 'close_ma20_ratio', 'close_ma120_ratio',
+        'volume_ma5_ratio', 'volume_ma10_ratio', 'volume_ma20_ratio', 'volume_ma120_ratio'
     ]
     # features_training_data = [
     #     'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',

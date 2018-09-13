@@ -9,9 +9,9 @@ import datetime
 # SELECT first("open") AS "first_open", max("high") AS "max_high", min("low") AS "min_low", last("close") AS "last_close", sum("volume") AS "sum_volume" FROM "coin_v2"."autogen"."binance_btc_usdt" GROUP BY time(1d) FILL(null)
 
 if __name__ == '__main__':
-    symbol = 'BTCUSDT'
-    t_start = '2018-08-16'
-    t_end = '2018-09-01'
+    symbol = 'BTCUSD'
+    t_start = '2014-05-01'
+    t_end = '2018-6-30'
     epoches = 1000
     balance = 100000
 
@@ -42,16 +42,14 @@ if __name__ == '__main__':
     training_data = training_data.dropna()
 
     # 차트 데이터 분리
-    features_chart_data = ['date', 'open', 'high', 'low', 'close', 'volume']
+    features_chart_data = ['date', 'open', 'high', 'low', 'close', 'volume', 'changeRate']
     chart_data = training_data[features_chart_data]
 
     # 학습 데이터 분리
     features_training_data = [
-        'rsi14', 'sma5', 'sma10', 'sma20', 'sma120', 'obv', 'ad',
-        'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',
-        'close_lastclose_ratio', 'volume_lastvolume_ratio',
-        'close_ma5_ratio', 'close_ma10_ratio', 'close_ma20_ratio', 'close_ma120_ratio',
-        'volume_ma5_ratio', 'volume_ma10_ratio', 'volume_ma20_ratio', 'volume_ma120_ratio'
+        'rsi14', 'stoch_9_6_slowk', 'stoch_9_6_slowd', 'stoch_14_slowk', 'stoch_14_slowd', 'macd', 'macdsignal', 'adx', 'willr', 'cci', 'ultosc', 'roc',
+        'close_ma5', 'close_ma10', 'close_ma20', 'close_ma50', 'close_ma100', 'close_ma200',
+        'volume_ma5', 'volume_ma10', 'volume_ma20', 'volume_ma50', 'volume_ma100', 'volume_ma200'
     ]
 
     training_data = training_data[features_training_data]
