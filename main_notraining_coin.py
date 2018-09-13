@@ -10,14 +10,16 @@ from policy_learner_coin import PolicyLearner
 
 
 if __name__ == '__main__':
-    symbol = 'BTCUSDT'
-    model_ver = '20180913112220'
+    symbol = 'XRPBTC'
+    model_ver = '20180913145305'
     start = '2018-01-01'
-    end = '2018-09-11'
+    end = '2018-09-12'
 
     # 로그 기록
     log_dir = os.path.join(settings.BASE_DIR, 'logs/%s' % symbol)
     timestr = settings.get_time_str()
+    if not os.path.exists('logs/%s' % symbol):
+        os.makedirs('logs/%s' % symbol)
     file_handler = logging.FileHandler(filename=os.path.join(
         log_dir, "%s_%s.log" % (symbol, timestr)), encoding='utf-8')
     stream_handler = logging.StreamHandler()
@@ -45,21 +47,11 @@ if __name__ == '__main__':
 
     # 학습 데이터 분리
     features_training_data = [
-        'rsi14', 'sma5', 'sma10', 'sma20', 'sma120', 'obv', 'ad',
-        'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',
-        'close_lastclose_ratio', 'volume_lastvolume_ratio',
-        'close_ma5_ratio', 'close_ma10_ratio', 'close_ma20_ratio', 'close_ma120_ratio',
-        'volume_ma5_ratio', 'volume_ma10_ratio', 'volume_ma20_ratio', 'volume_ma120_ratio'
+        'rsi14', 'stoch_9_6_slowk', 'stoch_9_6_slowd', 'stoch_14_slowk', 'stoch_14_slowd', 'macd', 'macdsignal', 'adx', 'willr', 'cci', 'ultosc', 'roc',
+        'close_ma5', 'close_ma10', 'close_ma20', 'close_ma50', 'close_ma100', 'close_ma200',
+        'volume_ma5', 'volume_ma10', 'volume_ma20', 'volume_ma50', 'volume_ma100', 'volume_ma200'
     ]
-    # features_training_data = [
-    #     'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',
-    #     'close_lastclose_ratio', 'volume_lastvolume_ratio',
-    #     'close_ma5_ratio', 'volume_ma5_ratio',
-    #     'close_ma10_ratio', 'volume_ma10_ratio',
-    #     'close_ma20_ratio', 'volume_ma20_ratio',
-    #     'close_ma60_ratio', 'volume_ma60_ratio',
-    #     'close_ma120_ratio', 'volume_ma120_ratio'
-    # ]
+
     training_data = training_data[features_training_data]
 
     # 비 학습 투자 시뮬레이션 시작
@@ -69,4 +61,4 @@ if __name__ == '__main__':
     policy_learner.trade(balance=100000,
                          model_path=os.path.join(
                              settings.BASE_DIR,
-                             'models/{}/model_{}.h5'.format(symbol, model_ver)))
+                             'models/model_{}.h5'.format(model_ver)))

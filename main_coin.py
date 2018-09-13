@@ -9,8 +9,8 @@ import datetime
 # SELECT first("open") AS "first_open", max("high") AS "max_high", min("low") AS "min_low", last("close") AS "last_close", sum("volume") AS "sum_volume" FROM "coin_v2"."autogen"."binance_btc_usdt" GROUP BY time(1d) FILL(null)
 
 if __name__ == '__main__':
-    symbol = 'BTCUSD'
-    t_start = '2014-05-01'
+    symbol = 'ADABTC'
+    t_start = '2017-12-01'
     t_end = '2018-6-30'
     epoches = 1000
     balance = 100000
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     training_data = training_data.dropna()
 
     # 차트 데이터 분리
-    features_chart_data = ['date', 'open', 'high', 'low', 'close', 'volume', 'changeRate']
+    features_chart_data = ['date', 'open', 'high', 'low', 'close', 'volume']
     chart_data = training_data[features_chart_data]
 
     # 학습 데이터 분리
@@ -57,15 +57,15 @@ if __name__ == '__main__':
     # 강화학습 시작
     policy_learner = PolicyLearner(
         symbol=symbol, chart_data=chart_data, training_data=training_data,
-        min_trading_unit=1, max_trading_unit=2, delayed_reward_threshold=.0000000005, lr=.00000001)
+        min_trading_unit=1, max_trading_unit=2, delayed_reward_threshold=.2, lr=.001)
     policy_learner.fit(balance=balance, num_epoches=epoches, discount_factor=0, start_epsilon=.5)
 
     training_end = datetime.datetime.now()
     delta = training_end - training_start
     logging.info("학습 소요시간: %s", delta)
-    logging.info("모델파일: models/%s/model_%s.h5", symbol, timestr)
+    logging.info("모델파일: models/model_%s.h5", timestr)
     # 정책 신경망을 파일로 저장
-    model_dir = os.path.join(settings.BASE_DIR, 'models/%s' % symbol)
+    model_dir = os.path.join(settings.BASE_DIR, 'models/')
     if not os.path.isdir(model_dir):
         os.makedirs(model_dir)
     model_path = os.path.join(model_dir, 'model_%s.h5' % timestr)

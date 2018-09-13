@@ -5,7 +5,7 @@ import talib
 
 def load_chart_data(fpath):
     chart_data = pd.read_csv(fpath, thousands=',', header=None)
-    chart_data.columns = ['date', 'open', 'high', 'low', 'close', 'volume', 'changeRate']
+    chart_data.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
     return chart_data
 
 
@@ -16,7 +16,7 @@ def preprocess(chart_data):
     low = prep_data['low']
     close = prep_data['close']
     volume = prep_data['volume']
-    changeRate = prep_data['changeRate']
+
 
     prep_data['rsi14'] = np.zeros(len(chart_data))
     prep_data['rsi14'] = talib.RSI(close, timeperiod=14)
@@ -64,7 +64,7 @@ def build_training_data(prep_data):
     low = prep_data['low']
     close = prep_data['close']
     volume = prep_data['volume']
-    changeRate = prep_data['changeRate']
+
 
     for window in [5, 10, 20, 50, 100, 200]:
         training_data['close_ma{}'.format(window)] = np.zeros(len(training_data))
