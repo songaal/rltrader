@@ -18,8 +18,8 @@ write_up_down_file_name = 'up_down_binance_btc_usdt_4h.csv'
 chart_data = pd.read_csv(fpath + load_file_name, thousands=',', header=None)
 chart_data.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
 
-chart_data['date'] = pd.to_datetime(chart_data['date'])
-chart_data = chart_data[(chart_data['date'] >= '2018-09-01') & (chart_data['date'] <= '2018-09-17')]
+# chart_data['date'] = pd.to_datetime(chart_data['date'])
+# chart_data = chart_data[(chart_data['date'] >= '2018-09-01') & (chart_data['date'] <= '2018-09-17')]
 
 high_low = []
 trend = 0
