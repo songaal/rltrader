@@ -17,11 +17,25 @@ load_file_name = 'binance_btc_usdt_4h.csv'
 write_up_down_file_name = 'up_down_binance_btc_usdt_4h.csv'
 chart_data = pd.read_csv(fpath + load_file_name, thousands=',', header=None)
 chart_data.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
+
 chart_data['date'] = pd.to_datetime(chart_data['date'])
+# chart_data = chart_data[(chart_data['date'] >= '2018-09-01') & (chart_data['date'] <= '2018-09-17')]
 
-# chart_data = chart_data[(chart_data['date'] >= '2018-09-15') & (chart_data['date'] <= '2018-09-17')]
+high_low = []
+trend = 0
+for i in range(len(chart_data.date)):
+    open = np.array(chart_data.open)[i]
+    close = np.array(chart_data.close)[i]
+    low = np.array(chart_data.low)[i]
+    high = np.array(chart_data.high)[i]
 
-X = np.array(chart_data.close)
+    # high_low.append(close)
+    if close >= open:
+        high_low.append(high)
+    else:
+        high_low.append(low)
+
+X = np.array(high_low)
 pivots = zigzag.peak_valley_pivots(X, 0.01, -0.01)
 """
 위 변곡점: 1
@@ -40,7 +54,7 @@ for pivot in pivots:
     actions.append(action)
 
 chart_data['actions'] = np.array(actions)
-chart_data.to_csv(fpath + write_up_down_file_name, mode='w')
+chart_data.to_csv(fpath + write_up_down_file_name, mode='w', index=False, header=False)
 print('저장 완료.')
 
 def ohlcv_polt(data):
@@ -52,8 +66,7 @@ def ohlcv_polt(data):
     close = np.array(data.close)
     volume = np.array(data.volume)
     candlestick2_ohlc(ax, open, high, low, close, width=0.6)
-
-    # ax.xaxis.set_major_locator(ticker.MaxNLocator(10))
+    ax.xaxis.set_major_locator(ticker.MaxNLocator(10))
     def mydate(x, pos):
         try:
             return pd.to_datetime(date[int(x)]).strftime('%Y.%m.%d %H:%M')
@@ -64,7 +77,7 @@ def ohlcv_polt(data):
     fig.tight_layout()
 
 
-def plot_pivots(chart_data, pivots):
+def plot_pivots(X, pivots):
     # plt.xlim(0, len(X))
     # plt.ylim(X.min()*0.99, X.max()*1.01)
     # # plt.plot(np.arange(len(X)), X, 'k:', alpha=0.5)
