@@ -19,7 +19,7 @@ chart_data = pd.read_csv(fpath + load_file_name, thousands=',', header=None)
 chart_data.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
 
 chart_data['date'] = pd.to_datetime(chart_data['date'])
-# chart_data = chart_data[(chart_data['date'] >= '2018-09-01') & (chart_data['date'] <= '2018-09-17')]
+chart_data = chart_data[(chart_data['date'] >= '2018-09-01') & (chart_data['date'] <= '2018-09-17')]
 
 high_low = []
 trend = 0
@@ -28,9 +28,18 @@ for i in range(len(chart_data.date)):
     close = np.array(chart_data.close)[i]
     low = np.array(chart_data.low)[i]
     high = np.array(chart_data.high)[i]
+    ohlcv4 = open + high + low + close / 4
+    if i == 0:
+        high_low.append(high if open < close else low)
+        continue
 
-    # high_low.append(close)
-    if close >= open:
+    p_open = np.array(chart_data.open)[i - 1]
+    p_close = np.array(chart_data.close)[i - 1]
+    p_low = np.array(chart_data.low)[i - 1]
+    p_high = np.array(chart_data.high)[i - 1]
+    p_ohlcv4 = p_open + p_high + p_low + p_close / 4
+
+    if p_ohlcv4 < ohlcv4:
         high_low.append(high)
     else:
         high_low.append(low)
