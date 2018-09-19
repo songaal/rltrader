@@ -9,7 +9,7 @@ from matplotlib.finance import candlestick2_ohlc
 
 fpath = os.path.dirname(os.path.abspath(__file__))
 fpath += '/data/ingest_data/'
-load_file_name = 'binance_btc_usdt_4h.csv'
+load_file_name = 'binance_btc_usdt_4h_sm.csv'
 write_up_down_file_name = 'up_down_binance_btc_usdt_4h.csv'
 chart_data = pd.read_csv(fpath + load_file_name, thousands=',', header=None)
 chart_data.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
@@ -47,7 +47,7 @@ for i in range(len(chart_data.date)):
         high_low.append(low)
 
 X = np.array(high_low)
-pivots = zigzag.peak_valley_pivots(X, 0.01, -0.01)
+pivots = zigzag.peak_valley_pivots(X, 0.03, -0.03)
 """
 위 변곡점: 1
 아래 변곡점: -1
@@ -58,17 +58,16 @@ action = None
 for pivot in pivots:
     if pivot == 1:
         action = 'D'
-        pass
     elif pivot == -1:
         action = 'U'
-        pass
+
     actions.append(action)
 
 chart_data['actions'] = np.array(actions)
 chart_data.to_csv(fpath + write_up_down_file_name, mode='w', index=False, header=False)
 print('저장 완료.')
 
-def ohlcv_polt(data):
+def ohlcv_plot(data):
     fig, ax = plt.subplots()
     date = data.date.values
     open = data.open.values
@@ -97,7 +96,7 @@ def plot_pivots(X, pivots):
     plt.scatter(np.arange(len(X))[pivots == -1], X[pivots == -1], color='r')
 
 
-ohlcv_polt(chart_data)
+ohlcv_plot(chart_data)
 plot_pivots(X, pivots)
 plt.show()
 

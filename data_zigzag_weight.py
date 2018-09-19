@@ -1,16 +1,10 @@
 import os
-import math
 
-import pandas
-import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.finance import candlestick2_ohlc
 import matplotlib.ticker as ticker
-import datetime as datetime
-import numpy as np
 import numpy as np
 import pandas as pd
-import zigzag
+from matplotlib.finance import candlestick2_ohlc
 
 fpath = os.path.dirname(os.path.abspath(__file__))
 fpath += '/data/ingest_data/'
@@ -71,7 +65,7 @@ write_chart_data.to_csv(fpath + write_weight_file_name, mode='w', header=False)
 print('저장 완료.')
 
 
-def ohlcv_polt(data):
+def ohlcv_plot(data):
     fig, ax = plt.subplots()
     date = np.array(data.date)
     open = np.array(data.open)
@@ -99,6 +93,6 @@ def plot_pivots(X, weight_list):
     # plt.plot(np.arange(len(X))[weight_list > 0.0], np.array(X)[weight_list > 0.0], color='b')
 
 
-ohlcv_polt(chart_data)
+ohlcv_plot(chart_data)
 plot_pivots(chart_data.high, weight_list)
 plt.show()
