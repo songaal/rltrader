@@ -23,20 +23,26 @@ chart_data.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
 
 high_low = []
 trend = 0
+
+open_a = np.array(chart_data.open)
+close_a = np.array(chart_data.close)
+low_a = np.array(chart_data.low)
+high_a = np.array(chart_data.high)
+
 for i in range(len(chart_data.date)):
-    open = np.array(chart_data.open)[i]
-    close = np.array(chart_data.close)[i]
-    low = np.array(chart_data.low)[i]
-    high = np.array(chart_data.high)[i]
+    open = open_a[i]
+    close = close_a[i]
+    low = low_a[i]
+    high = high_a[i]
     ohlcv4 = open + high + low + close / 4
     if i == 0:
         high_low.append(high if open < close else low)
         continue
 
-    p_open = np.array(chart_data.open)[i - 1]
-    p_close = np.array(chart_data.close)[i - 1]
-    p_low = np.array(chart_data.low)[i - 1]
-    p_high = np.array(chart_data.high)[i - 1]
+    p_open = open_a[i - 1]
+    p_close = close_a[i - 1]
+    p_low = low_a[i - 1]
+    p_high = high_a[i - 1]
     p_ohlcv4 = p_open + p_high + p_low + p_close / 4
 
     if p_ohlcv4 < ohlcv4:
