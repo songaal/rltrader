@@ -1,15 +1,11 @@
 import os
 
-import pandas
-import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.finance import candlestick2_ohlc
 import matplotlib.ticker as ticker
-import datetime as datetime
-import numpy as np
 import numpy as np
 import pandas as pd
 import zigzag
+from matplotlib.finance import candlestick2_ohlc
 
 fpath = os.path.dirname(os.path.abspath(__file__))
 fpath += '/data/ingest_data/'
@@ -24,10 +20,10 @@ chart_data.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
 high_low = []
 trend = 0
 
-open_a = np.array(chart_data.open)
-close_a = np.array(chart_data.close)
-low_a = np.array(chart_data.low)
-high_a = np.array(chart_data.high)
+open_a = chart_data.open.values
+close_a = chart_data.close.values
+low_a = chart_data.low.values
+high_a = chart_data.high.values
 
 for i in range(len(chart_data.date)):
     open = open_a[i]
@@ -74,12 +70,12 @@ print('저장 완료.')
 
 def ohlcv_polt(data):
     fig, ax = plt.subplots()
-    date = np.array(data.date)
-    open = np.array(data.open)
-    high = np.array(data.high)
-    low = np.array(data.low)
-    close = np.array(data.close)
-    volume = np.array(data.volume)
+    date = data.date.values
+    open = data.open.values
+    high = data.high.values
+    low = data.low.values
+    close = data.close.values
+    volume = data.volume.values
     candlestick2_ohlc(ax, open, high, low, close, width=0.6)
     ax.xaxis.set_major_locator(ticker.MaxNLocator(10))
     def mydate(x, pos):
