@@ -61,7 +61,7 @@ weight_list = np.array(weight_list)
 write_chart_data = chart_data.drop(0)
 write_chart_data = write_chart_data.drop(columns='action')
 write_chart_data['weight'] = np.array(weight_list)
-write_chart_data.to_csv(fpath + write_weight_file_name, mode='w', header=False)
+write_chart_data.to_csv(fpath + write_weight_file_name, mode='w', header=False, index=False)
 print('저장 완료.')
 
 
