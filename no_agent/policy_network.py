@@ -1,6 +1,6 @@
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Activation, LSTM, Dense, BatchNormalization, Embedding
+from keras.layers import Activation, LSTM, Dense, BatchNormalization, Embedding, Input
 from keras.optimizers import sgd
 from keras import callbacks
 
@@ -11,6 +11,11 @@ class PolicyNetwork:
 
         # LSTM 신경망
         self.model = Sequential()
+
+
+
+
+        # 기존 LSTM 모델
         self.model.add(LSTM(256, input_shape=input_dim,
                             return_sequences=True, stateful=False, dropout=0.5))
         self.model.add(BatchNormalization())
@@ -34,6 +39,10 @@ class PolicyNetwork:
 
     def fit(self, x_train, y_train, x_test, y_test, epochs=1000, batch_size=10):
         tensorboard = callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True)
+
+        x_train = np.reshape(x_train, (x_train.shape[0], 1, x_train.shape[1]))
+        x_test = np.reshape(x_test, (x_test.shape[0], 1, x_test.shape[1]))
+
         self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_data=(x_test, y_test), callbacks=[tensorboard])
 
     def save_model(self, model_path):
