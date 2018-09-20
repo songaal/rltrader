@@ -10,8 +10,7 @@ def load_chart_data(fpath):
 
 def preprocess(chart_data):
     prep_data = chart_data
-    # windows = [5, 10, 20, 60, 120]
-    windows = [5, 10]
+    windows = [5, 10, 20, 60, 120]
     for window in windows:
         prep_data['close_ma{}'.format(window)] = prep_data['close'].rolling(window).mean()
         prep_data['volume_ma{}'.format(window)] = (
@@ -43,8 +42,7 @@ def build_training_data(prep_data):
             .replace(to_replace=0, method='ffill') \
             .replace(to_replace=0, method='bfill').values
 
-    # windows = [5, 10, 20, 60, 120]
-    windows = [5, 10]
+    windows = [5, 10, 20, 60, 120]
     for window in windows:
         training_data['close_ma%d_ratio' % window] = \
             (training_data['close'] - training_data['close_ma%d' % window]) / \

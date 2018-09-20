@@ -23,6 +23,11 @@ class PolicyLearner:
         self.policy_network = PolicyNetwork(input_dim=self.num_features, lr=lr)
 
     def fit(self, x_train, y_train, x_test, y_test, num_epoches=1000, batch_size=10):
+        x_train = np.array(x_train)
+        y_train = np.array(y_train)
+        x_test = np.array(x_test)
+        y_test = np.array(y_test)
+
         self.policy_network.fit(x_train=x_train, y_train=y_train,
                                 epochs=num_epoches, batch_size=batch_size,
                                 x_test=x_test, y_test=y_test)
@@ -31,5 +36,6 @@ class PolicyLearner:
         if model_path is None:
             return
         self.policy_network.load_model(model_path=model_path)
-        # self.fit(learning=False)
-        self.policy_network.predict(x)
+        prob = self.policy_network.predict(x)
+        # 예측 결과..
+        print(prob)

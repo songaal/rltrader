@@ -1,6 +1,6 @@
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Activation, LSTM, Dense, BatchNormalization
+from keras.layers import Activation, LSTM, Dense, BatchNormalization, Embedding
 from keras.optimizers import sgd
 from keras import callbacks
 
@@ -29,7 +29,7 @@ class PolicyNetwork:
 
     def predict(self, x):
         # self.prob = self.model.predict(np.array(sample).reshape((1, -1, self.input_dim)))[0]
-        self.prob = self.model.predict(x)
+        self.prob = self.model.predict(x)[0]
         return self.prob
 
     def fit(self, x_train, y_train, x_test, y_test, epochs=1000, batch_size=10):

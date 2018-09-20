@@ -18,9 +18,9 @@ if __name__ == '__main__':
     chart_data = data_manager.build_training_data(prep_data)
 
     # 기간 필터링
-    x_train = chart_data[(chart_data['date'] >= '2018-09-01') & (chart_data['date'] <= '2018-09-10')]
+    x_train = chart_data[(chart_data['date'] >= '2017-11-01') & (chart_data['date'] < '2018-07-01')]
     x_train = x_train.dropna()
-    x_test = chart_data[(chart_data['date'] > '2018-09-11') & (chart_data['date'] <= '2018-09-18')]
+    x_test = chart_data[(chart_data['date'] > '2018-07-01') & (chart_data['date'] < '2018-08-01')]
     x_test = x_test.dropna()
 
     # x, y 데이터 분리
@@ -39,17 +39,17 @@ if __name__ == '__main__':
         'close_lastclose_ratio', 'volume_lastvolume_ratio',
         'close_ma5_ratio', 'volume_ma5_ratio',
         'close_ma10_ratio', 'volume_ma10_ratio',
-        # 'close_ma20_ratio', 'volume_ma20_ratio',
-        # 'close_ma60_ratio', 'volume_ma60_ratio',
-        # 'close_ma120_ratio', 'volume_ma120_ratio'
+        'close_ma20_ratio', 'volume_ma20_ratio',
+        'close_ma60_ratio', 'volume_ma60_ratio',
+        'close_ma120_ratio', 'volume_ma120_ratio'
     ]
     training_data = x_train[features_training_data]
     test_data = x_test[features_training_data]
 
     # 강화학습 시작
     policy_learner = PolicyLearner(symbol=symbol, chart_data=chart_data, training_data=training_data, test_data=test_data, lr=.001)
-    policy_learner.fit(x_train=training_data, y_train=y_train, x_test=test_data, y_test=y_test, num_epoches=1000)
 
+    policy_learner.fit(x_train=training_data, y_train=y_train, x_test=test_data, y_test=y_test, num_epoches=1000)
 
     # 정책 신경망을 파일로 저장
     model_path = os.path.join(settings.BASE_DIR, 'model_%s_%s_%s_%s.h5' % exchange, symbol, periods, timestr)
