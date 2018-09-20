@@ -24,7 +24,7 @@ class PolicyNetwork:
         self.model.add(BatchNormalization())
         self.model.add(LSTM(256, return_sequences=False, stateful=False, dropout=0.5))
         self.model.add(BatchNormalization())
-        self.model.add(Dense(output_dim))
+        self.model.add(Dense(1))
         self.model.add(Activation('sigmoid'))
 
         self.model.compile(optimizer=sgd(lr=lr), loss='mse')
@@ -38,12 +38,13 @@ class PolicyNetwork:
         self.prob = self.model.predict(x)[0]
         return self.prob
 
-    def fit(self, x_train, y_train, x_test, y_test, epochs=1000, batch_size=10):
+    def fit(self, x_train, y_train, x_test, y_test, epochs=1000, batch_size=10, model_path=None):
         tensorboard = callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True)
+        model_checkpoint = callbacks.ModelCheckpoint(filepath=model_path, save_best_only=True)
         self.model.fit(x_train, y_train,
                        batch_size=batch_size, epochs=epochs,
                        validation_data=(x_test, y_test),
-                       callbacks=[tensorboard])
+                       callbacks=[tensorboard, model_checkpoint])
 
     def save_model(self, model_path):
         if model_path is not None and self.model is not None:

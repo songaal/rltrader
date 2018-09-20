@@ -29,6 +29,7 @@ if __name__ == '__main__':
     symbol = 'btc_usdt'
     periods = '4h'
     timestr = settings.get_time_str()
+    model_path = os.path.join(settings.BASE_DIR, 'models/model_%s_%s_{epoch:02d}_%s.hdf5' % (symbol, periods, timestr))
 
     # 코인 데이터 준비
     chart_data = data_manager.load_chart_data(os.path.join(settings.BASE_DIR, 'weight_%s_%s_%s.csv' % (exchange, symbol, periods)))
@@ -62,7 +63,7 @@ if __name__ == '__main__':
     # 강화학습 시작
     policy_learner = PolicyLearner(symbol=symbol, x_train=x_train, lr=.001)
 
-    policy_learner.fit(x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, num_epoches=1000)
+    policy_learner.fit(x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, num_epoches=1000, model_path=model_path)
 
     # 정책 신경망을 파일로 저장
     model_path = os.path.join(settings.BASE_DIR, 'model_%s_%s_%s_%s.h5' % exchange, symbol, periods, timestr)

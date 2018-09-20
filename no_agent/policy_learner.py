@@ -18,11 +18,12 @@ class PolicyLearner:
         self.num_features = self.x_train.shape
         self.policy_network = PolicyNetwork(input_dim=self.num_features, lr=lr)
 
-    def fit(self, x_train, y_train, x_test, y_test, num_epoches=1000, batch_size=10):
+    def fit(self, x_train, y_train, x_test, y_test, num_epoches=1000, batch_size=10, model_path=None):
 
         self.policy_network.fit(x_train=x_train, y_train=y_train,
                                 epochs=num_epoches, batch_size=batch_size,
-                                x_test=x_test, y_test=y_test)
+                                x_test=x_test, y_test=y_test,
+                                model_path=model_path)
 
     def trade(self, x, model_path=None):
         if model_path is None:
