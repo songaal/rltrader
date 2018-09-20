@@ -2,7 +2,7 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Activation, LSTM, Dense, BatchNormalization
 from keras.optimizers import sgd
-
+from keras import callbacks
 
 class PolicyNetwork:
     def __init__(self, input_dim, output_dim=0, lr=0.01):
@@ -11,23 +11,15 @@ class PolicyNetwork:
 
         # LSTM 신경망
         self.model = Sequential()
-
-        self.model.add(LSTM(32, input_shape=(10, 1)))
-        self.model.add(Dense(1))
-
-
-        # self.model.add(LSTM(256, input_shape=input_dim, return_sequences=True, stateful=False, dropout=0.5))
-        # self.model.add(LSTM(256, input_shape=(input_dim[0], input_dim[1]), return_sequences=True, stateful=False, dropout=0.5))
-        # self.model.add(Dense(1))
-        # self.model.add(LSTM(256, input_shape=(28, 28), return_sequences=True, stateful=False, dropout=0.5))
-
-        # self.model.add(BatchNormalization())
-        # self.model.add(LSTM(256, return_sequences=True, stateful=False, dropout=0.5))
-        # self.model.add(BatchNormalization())
-        # self.model.add(LSTM(256, return_sequences=False, stateful=False, dropout=0.5))
-        # self.model.add(BatchNormalization())
-        # self.model.add(Dense(output_dim))
-        # self.model.add(Activation('sigmoid'))
+        self.model.add(LSTM(256, input_shape=input_dim,
+                            return_sequences=True, stateful=False, dropout=0.5))
+        self.model.add(BatchNormalization())
+        self.model.add(LSTM(256, return_sequences=True, stateful=False, dropout=0.5))
+        self.model.add(BatchNormalization())
+        self.model.add(LSTM(256, return_sequences=False, stateful=False, dropout=0.5))
+        self.model.add(BatchNormalization())
+        self.model.add(Dense(output_dim))
+        self.model.add(Activation('sigmoid'))
 
         self.model.compile(optimizer=sgd(lr=lr), loss='mse')
         self.prob = None
@@ -40,11 +32,9 @@ class PolicyNetwork:
         self.prob = self.model.predict(x)
         return self.prob
 
-    def fit(self, x_train, y_train, epochs=1000, batch_size=10):
-        hist = self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs)
-        print('## training loss and acc ##')
-        print(hist.history['loss'])
-        print(hist.history['acc'])
+    def fit(self, x_train, y_train, x_test, y_test, epochs=1000, batch_size=10):
+        tensorboard = callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True)
+        self.model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_data=(x_test, y_test), callbacks=[tensorboard])
 
     def save_model(self, model_path):
         if model_path is not None and self.model is not None:
