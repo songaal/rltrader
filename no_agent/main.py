@@ -1,9 +1,28 @@
 import os
 
 import pandas as pd
-
+import numpy as np
 from no_agent import settings, data_manager
 from no_agent.policy_learner import PolicyLearner
+
+
+def seq2dataset(seq, window_size, features_training_data):
+    dataset_I = []
+    dataset_X = []
+    dataset_Y = []
+
+    for i in range(len(seq) - window_size):
+        subset = seq[i:(i + window_size + 1)]
+
+        for si in range(len(subset) - 1):
+            features = subset[features_training_data].values[si]
+            dataset_I.append(features)
+        dataset_X.append(dataset_I)
+        dataset_I = []
+        dataset_Y.append([subset.weight.values[window_size]])
+
+    return np.array(dataset_X), np.array(dataset_Y)
+
 
 if __name__ == '__main__':
     exchange = 'binance'
@@ -18,20 +37,14 @@ if __name__ == '__main__':
     chart_data = data_manager.build_training_data(prep_data)
 
     # 기간 필터링
-    x_train = chart_data[(chart_data['date'] >= '2017-11-01') & (chart_data['date'] < '2018-07-01')]
-    x_train = x_train.dropna()
-    x_test = chart_data[(chart_data['date'] > '2018-07-01') & (chart_data['date'] < '2018-08-01')]
-    x_test = x_test.dropna()
-
-    # x, y 데이터 분리
-    y_train = x_train['weight']
-    del x_train['weight']
-    y_test = x_test['weight']
-    del x_test['weight']
+    x_in = chart_data[(chart_data['date'] >= '2017-11-01') & (chart_data['date'] < '2018-07-01')]
+    x_in = x_in.dropna()
+    x_test_in = chart_data[(chart_data['date'] >= '2018-07-01') & (chart_data['date'] < '2018-09-01')]
+    x_test_in = x_in.dropna()
 
     # 차트 데이터 분리
-    features_chart_data = ['date', 'open', 'high', 'low', 'close', 'volume']
-    chart_data = chart_data[features_chart_data]
+    # features_chart_data = ['date', 'open', 'high', 'low', 'close', 'volume']
+    # chart_data = chart_data[features_chart_data]
 
     # 학습 데이터 분리
     features_training_data = [
@@ -43,13 +56,13 @@ if __name__ == '__main__':
         'close_ma60_ratio', 'volume_ma60_ratio',
         'close_ma120_ratio', 'volume_ma120_ratio'
     ]
-    training_data = x_train[features_training_data]
-    test_data = x_test[features_training_data]
+    x_train, y_train = seq2dataset(x_in, window_size=5, features_training_data=features_training_data)
+    x_test, y_test = seq2dataset(x_test_in, window_size=5, features_training_data=features_training_data)
 
     # 강화학습 시작
-    policy_learner = PolicyLearner(symbol=symbol, chart_data=chart_data, training_data=training_data, test_data=test_data, lr=.001)
+    policy_learner = PolicyLearner(symbol=symbol, x_train=x_train, lr=.001)
 
-    policy_learner.fit(x_train=training_data, y_train=y_train, x_test=test_data, y_test=y_test, num_epoches=1000)
+    policy_learner.fit(x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, num_epoches=1000)
 
     # 정책 신경망을 파일로 저장
     model_path = os.path.join(settings.BASE_DIR, 'model_%s_%s_%s_%s.h5' % exchange, symbol, periods, timestr)
