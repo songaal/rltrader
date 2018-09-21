@@ -21,10 +21,11 @@ def preprocess(chart_data):
 def build_training_data(prep_data):
     training_data = prep_data
 
-    training_data['open_lastclose_ratio'] = np.zeros(len(training_data))
-    training_data.loc[1:, 'open_lastclose_ratio'] = \
-        (training_data['open'][1:].values - training_data['close'][:-1].values) / \
-        training_data['close'][:-1].values
+    training_data['open_close_ratio'] = np.zeros(len(training_data))
+    training_data['open_close_ratio'] = \
+        (training_data['open'].values - training_data['close'].values) / \
+        training_data['open'].values
+
     training_data['high_close_ratio'] = \
         (training_data['high'].values - training_data['close'].values) / \
         training_data['close'].values

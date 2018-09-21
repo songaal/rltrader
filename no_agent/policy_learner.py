@@ -29,8 +29,4 @@ class PolicyLearner:
         if model_path is None:
             return
         self.policy_network.load_model(model_path=model_path)
-        prob = self.policy_network.predict(x)
-        # 예측 결과.. -1 ~ 1 사이의 값..?
-        # 1 매수
-        # -1 매도
-        print(prob)
+        return self.policy_network.predict(x)

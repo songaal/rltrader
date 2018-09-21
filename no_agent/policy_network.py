@@ -25,26 +25,23 @@ class PolicyNetwork:
         self.model.add(LSTM(256, return_sequences=False, stateful=False, dropout=0.5))
         self.model.add(BatchNormalization())
         self.model.add(Dense(1))
-        self.model.add(Activation('sigmoid'))
+        self.model.add(Activation('linear'))
 
-        self.model.compile(optimizer=sgd(lr=lr), loss='mse')
-        self.prob = None
-
-    def reset(self):
+        self.model.compile(optimizer=sgd(lr=lr), loss='mse', metrics=['accuracy'])
         self.prob = None
 
     def predict(self, x):
-        # self.prob = self.model.predict(np.array(sample).reshape((1, -1, self.input_dim)))[0]
-        self.prob = self.model.predict(x)[0]
-        return self.prob
+        return self.model.predict(x)[0]
 
     def fit(self, x_train, y_train, x_test, y_test, epochs=1000, batch_size=10, model_path=None):
         tensorboard = callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True)
         model_checkpoint = callbacks.ModelCheckpoint(filepath=model_path, save_best_only=True)
+        early_stopping = callbacks.EarlyStopping(monitor='val_loss', patience=10, verbose=1)
         self.model.fit(x_train, y_train,
                        batch_size=batch_size, epochs=epochs,
                        validation_data=(x_test, y_test),
-                       callbacks=[tensorboard, model_checkpoint])
+                       callbacks=[tensorboard, model_checkpoint, early_stopping])
+
 
     def save_model(self, model_path):
         if model_path is not None and self.model is not None:

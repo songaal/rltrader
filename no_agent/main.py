@@ -28,11 +28,16 @@ if __name__ == '__main__':
     exchange = 'binance'
     symbol = 'btc_usdt'
     periods = '4h'
+    load_file_name = 'weight_%s_%s_%s.csv' % (exchange, symbol, periods)
+    model_name = 'model_{epoch:02d}.hdf5'
     timestr = settings.get_time_str()
-    model_path = os.path.join(settings.BASE_DIR, 'models/model_%s_%s_{epoch:02d}_%s.hdf5' % (symbol, periods, timestr))
+    model_path = os.path.join(settings.PROJECT_DIR, 'models/%s/%s/%s/%s' % (exchange, symbol, periods, timestr))
+
+    if not os.path.exists(model_path):
+        os.makedirs(model_path)
 
     # 코인 데이터 준비
-    chart_data = data_manager.load_chart_data(os.path.join(settings.BASE_DIR, 'weight_%s_%s_%s.csv' % (exchange, symbol, periods)))
+    chart_data = data_manager.load_chart_data(os.path.join(settings.PROJECT_DIR, 'data/ingest_data/', load_file_name))
     chart_data['date'] = pd.to_datetime(chart_data['date'])
     prep_data = data_manager.preprocess(chart_data)
     chart_data = data_manager.build_training_data(prep_data)
@@ -43,13 +48,9 @@ if __name__ == '__main__':
     x_test_in = chart_data[(chart_data['date'] >= '2018-07-01') & (chart_data['date'] < '2018-09-01')]
     x_test_in = x_in.dropna()
 
-    # 차트 데이터 분리
-    # features_chart_data = ['date', 'open', 'high', 'low', 'close', 'volume']
-    # chart_data = chart_data[features_chart_data]
-
     # 학습 데이터 분리
     features_training_data = [
-        'open_lastclose_ratio', 'high_close_ratio', 'low_close_ratio',
+        'open_close_ratio', 'high_close_ratio', 'low_close_ratio',
         'close_lastclose_ratio', 'volume_lastvolume_ratio',
         'close_ma5_ratio', 'volume_ma5_ratio',
         'close_ma10_ratio', 'volume_ma10_ratio',
@@ -63,8 +64,9 @@ if __name__ == '__main__':
     # 강화학습 시작
     policy_learner = PolicyLearner(symbol=symbol, x_train=x_train, lr=.001)
 
-    policy_learner.fit(x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, num_epoches=1000, model_path=model_path)
-
-    # 정책 신경망을 파일로 저장
-    model_path = os.path.join(settings.BASE_DIR, 'model_%s_%s_%s_%s.h5' % exchange, symbol, periods, timestr)
-    policy_learner.policy_network.save_model(model_path)
+    policy_learner.fit(x_train=x_train,
+                       y_train=y_train,
+                       x_test=x_test,
+                       y_test=y_test,
+                       num_epoches=1000,
+                       model_path='%s/%s' % (model_path, model_name))
