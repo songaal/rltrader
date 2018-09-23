@@ -110,3 +110,4 @@ venv.bak/
 /etc/
 /.idea/
 /.vscode/
+/no_agent/logs/

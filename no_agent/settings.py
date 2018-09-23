@@ -47,6 +47,7 @@ SERVER_WS_URL = "ws://%s:%s/ws" % (SERVER_ADDR, SERVER_PORT)
 # Settings for Project
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+PROJECT_DIR = os.path.dirname(os.path.abspath(""))
 
 # Settings for Templates
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
