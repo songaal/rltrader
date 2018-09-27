@@ -10,12 +10,12 @@ from matplotlib.finance import candlestick2_ohlc
 fpath = os.path.dirname(os.path.abspath(__file__))
 fpath += '/data/ingest_data/'
 load_file_name = 'binance_btc_usdt_4h.csv'
-write_up_down_file_name = 'up_down_binance_btc_usdt_4h.csv'
+write_up_down_file_name = 'action_binance_btc_usdt_4h.csv'
 chart_data = pd.read_csv(fpath + load_file_name, thousands=',', header=None)
 chart_data.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
 
 chart_data['date'] = pd.to_datetime(chart_data['date'])
-chart_data = chart_data[(chart_data['date'] >= '2017-11-19') & (chart_data['date'] <= '2017-12-31')]
+# chart_data = chart_data[(chart_data['date'] >= '2017-11-01') & (chart_data['date'] <= '2018-02-01')]
 
 high_low = []
 trend = 0
@@ -84,7 +84,8 @@ for index in range(len(pivots)):
 
     if last_action is None:
         # 처음엔 상태가 없으므로 매수
-        act = 'S'
+        act = 'B'
+        tmp_pivot = 1
     elif pivot != 0 or current_hold_count > 0:
         # 홀드봉이 있을 경우.
         # pivot 0 아닌 경우
@@ -146,13 +147,14 @@ for index in range(len(pivots)):
 
 actions = np.array(actions)
 
-
-# chart_data['actions'] = np.array(actions)
-# chart_data.to_csv(fpath + write_up_down_file_name, mode='w', index=False, header=False)
-print('저장 완료.')
-
-
-
+fake_data = zip(range(len(actions)), chart_data.date, actions)
+act_data = pd.DataFrame([data for num, *data in fake_data], columns=['date', 'action'])
+act_one_hot = pd.get_dummies(act_data)
+chart_data = pd.merge(chart_data, act_one_hot, on='date')
+# B, H, S
+chart_data.to_csv(fpath + write_up_down_file_name, mode='w', index=False, header=False)
+print(chart_data.head(10))
+print('저장 완료. {}'.format(fpath + write_up_down_file_name))
 
 def ohlcv_plot(data):
     fig, ax = plt.subplots()
