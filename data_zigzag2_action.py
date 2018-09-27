@@ -15,7 +15,7 @@ chart_data = pd.read_csv(fpath + load_file_name, thousands=',', header=None)
 chart_data.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
 
 chart_data['date'] = pd.to_datetime(chart_data['date'])
-chart_data = chart_data[(chart_data['date'] >= '2018-09-01') & (chart_data['date'] <= '2018-09-17')]
+chart_data = chart_data[(chart_data['date'] >= '2017-11-19') & (chart_data['date'] <= '2017-12-31')]
 
 high_low = []
 trend = 0
@@ -52,10 +52,8 @@ swsong
 
 """
 
-hold_count = 0
-
+hold_count = 1
 left_hold_range = 0.33
-
 right_hold_range = 0.01
 
 # action = 'B', 'S', 'H'
@@ -64,12 +62,16 @@ actions = []
 last_action = None
 last_action_price = None
 last_action_index = 0
+highest_price = 0
+lowest_price = 0
+prev_pivot_index = 0
+tmp_pivot = None
+current_hold_count = hold_count
 
-
-def get_next_pivot_index(index):
+def get_next_pivot_index(index, hold_count):
     next_index = None
-    for i in range(index + 1, len(pivots)):
-        if pivots[index] != 0:
+    for i in range(index + hold_count, len(pivots)):
+        if pivots[i] != 0:
             next_index = i
             break
     return next_index
@@ -80,45 +82,71 @@ for index in range(len(pivots)):
     pivot = pivots[index]
     act = None
 
-    if hold_count > 0:
-        # 액션 후 홀드봉 갯수 차감
-        hold_count -= 1
-
     if last_action is None:
         # 처음엔 상태가 없으므로 매수
-        act = 'B'
-    elif hold_count > 0 and pivot != 0:
+        act = 'S'
+    elif pivot != 0 or current_hold_count > 0:
         # 홀드봉이 있을 경우.
         # pivot 0 아닌 경우
         act = 'H'
+        current_hold_count -= 1
+        if pivot != 0:
+            tmp_pivot = pivot
+            prev_pivot_index = index
+            if current_hold_count <= 0:
+                current_hold_count = hold_count
     else:
-        next_index = get_next_pivot_index(index)
-        if next_index is not None:
-            print(index, next_index)
-
-        if next_index is None:
+        next_pivot_index = get_next_pivot_index(index, 1)
+        if next_pivot_index is None:
             act = 'H'
         else:
-            # 좌측 확인
-            is_left_action = (next_index - index) / next_index < left_hold_range
-            # 우측 확인
-            is_right_action = (last_action_price - price) / price < right_hold_range
+            print('--------------------------------------------')
+            print('date: {}'.format(chart_data['date'].values[index]))
 
-            if is_left_action and is_right_action:
-                if last_action == 'B':
-                    act = 'S'
-                elif last_action == 'S':
+            total_count = next_pivot_index - prev_pivot_index
+            current_count = index - prev_pivot_index
+
+            act = 'H'
+            if tmp_pivot == -1:
+                is_left_hold_action = (total_count - current_count) / total_count < left_hold_range
+                is_right_hold_action = abs(lowest_price - price) / price < right_hold_range
+                print('매수')
+                print('left: {}, right: {}'.format(is_left_hold_action, is_right_hold_action))
+                if is_left_hold_action or is_right_hold_action:
+                    act = 'H'
+                else:
                     act = 'B'
-            else:
-                act = 'H'
+            if tmp_pivot == 1:
+                is_left_hold_action = (total_count - current_count) / total_count < left_hold_range
+                is_right_hold_action = (highest_price - price) / price < right_hold_range
+                print('매도')
+                print('left: {}, right: {}'.format(is_left_hold_action, is_right_hold_action))
+                if is_left_hold_action or is_right_hold_action:
+                    act = 'H'
+                else:
+                    act = 'S'
+
+            print('act: {}, trends: {}'.format(act, tmp_pivot))
+            print('price: {}, lowest: {}, lowest: {}'.format(price, lowest_price, lowest_price))
+            print('--------------------------------------------')
+
+    if highest_price < price:
+        highest_price = price
+    if lowest_price > price:
+        lowest_price = price
 
     if act != 'H':
         last_action = act
         last_action_price = price
         last_action_index = index
+        highest_price = price
+        lowest_price = price
+
     actions.append(act)
 
 actions = np.array(actions)
+
+
 # chart_data['actions'] = np.array(actions)
 # chart_data.to_csv(fpath + write_up_down_file_name, mode='w', index=False, header=False)
 print('저장 완료.')
@@ -148,14 +176,12 @@ def ohlcv_plot(data):
 
 def plot_pivots(X, pivots):
     plt.plot(np.arange(len(X))[pivots != 0], X[pivots != 0], 'k-')
-    plt.scatter(np.arange(len(X))[pivots == 1], X[pivots == 1], color='g')
-    plt.scatter(np.arange(len(X))[pivots == -1], X[pivots == -1], color='r')
+    # plt.scatter(np.arange(len(X))[pivots == 1], X[pivots == 1], color='g')
+    # plt.scatter(np.arange(len(X))[pivots == -1], X[pivots == -1], color='r')
 
 def plot_actions(X, actions):
-    plt.plot(np.arange(len(X)), X, 'k-')
-
-    plt.scatter(np.arange(len(X))[actions == 'B'], X[actions == 'B'], color='b')
-    # plt.scatter(np.arange(len(X))[actions == 'S'], X[actions == 'S'], color='r')
+    plt.scatter(np.arange(len(X))[actions == 'B'], X[actions == 'B'], color='g')
+    plt.scatter(np.arange(len(X))[actions == 'S'], X[actions == 'S'], color='r')
     # plt.scatter(np.arange(len(X))[actions == 'H'], X[actions == 'H'], color='b')
 
 
