@@ -2,6 +2,7 @@ import logging
 import os
 import math
 import pandas as pd
+import keras as k
 import numpy as np
 from no_agent2 import data_manager, settings
 from no_agent2.data_manager import seq2dataset
@@ -45,12 +46,13 @@ if __name__ == '__main__':
     for i in range(len(x)):
         y = policy_learner.trade(x[i].reshape(1, 5, 15), model_path='%s/%s' % (model_path, model_name))
 
-        is_match = (t[i] > 0 and y > 0) or (t[i] == 0 and y == 0) or (t[i] < 0 and y < 0)
-        diff_rate = (t[i][0] - y) / t[i][0]
+        t1 = 'B' if np.argmax(t[i]) == 0 else 'S' if np.argmax(t[i]) == 2 else 'H'
+        y1 = 'B' if np.argmax(y) == 0 else 'S' if np.argmax(y) == 2 else 'H'
+        is_match = np.argmax(t[i]) == np.argmax(y)
 
-        print('날짜: {} 가격: {} \t정답: {} \t예측: {} \t매치여부: {} 차이 비율: {}'.format(pd.to_datetime(date[i]),
-                                                                                       close[i],
-                                                                                       math.ceil(t[i][0] * 100) / 100,
-                                                                                       math.ceil(y * 100) / 100,
-                                                                                       is_match,
-                                                                                       diff_rate))
+        print('날짜: {} 가격: {} \t정답: {} \t예측: {} \t 매치여부: {}'.format(pd.to_datetime(date[i]),
+                                                                 close[i],
+                                                                t1,
+                                                                y1,
+                                                                 is_match)
+              )
