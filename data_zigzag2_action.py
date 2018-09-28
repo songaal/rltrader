@@ -15,7 +15,7 @@ chart_data = pd.read_csv(fpath + load_file_name, thousands=',', header=None)
 chart_data.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
 
 chart_data['date'] = pd.to_datetime(chart_data['date'])
-# chart_data = chart_data[(chart_data['date'] >= '2017-11-01') & (chart_data['date'] <= '2018-02-01')]
+chart_data = chart_data[(chart_data['date'] >= '2017-11-01') & (chart_data['date'] <= '2018-02-01')]
 
 high_low = []
 trend = 0
@@ -53,7 +53,7 @@ swsong
 """
 
 hold_count = 1
-left_hold_range = 0.33
+left_hold_range = 0.15
 right_hold_range = 0.01
 
 # action = 'B', 'S', 'H'
